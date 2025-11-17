@@ -3,12 +3,12 @@ package org.example.squaregameapi.service;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.GameFactory;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
+import org.example.squaregameapi.GamePlugin;
 import org.example.squaregameapi.GameService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -17,26 +17,40 @@ public class GameServiceImpl implements GameService {
     private Map<String, Game> games = new HashMap<>();
 
     // Stockage des factories en Map
-    private Map<String, GameFactory> factories = new HashMap<>();
+    //private Map<String, GameFactory> factories = new HashMap<>();
 
-    public GameServiceImpl() {
-        // Initialisation des factories
-        factories.put("tic-tac-toe", new TicTacToeGameFactory());
+    // Stockage des plugins en Map
+    private Map<String, GamePlugin> plugins = new HashMap<>();
+
+    @Autowired
+    public GameServiceImpl(List<GamePlugin> pluginList) {
+        pluginList.forEach(plugin -> plugins.put(plugin.getGameType(), plugin));
     }
+
+//    public GameServiceImpl() {
+//        // Initialisation des factories
+//        factories.put("tic-tac-toe", new TicTacToeGameFactory());
+//    }
 
     @Override
     public String createGame(String gameType, int playerCount, int boardSize) {
         // Récupérer la factory selon gameType
-        GameFactory factory = factories.get(gameType);
+        //GameFactory factory = factories.get(gameType);
+
+        GamePlugin plugin = plugins.get(gameType);
 
         // Vérifier qu'elle existe
-        if (factory == null) {
+        if (plugin == null) {
             // Pour l'instant retourne null plus tard Exception
             return null;
         }
 
+        // Convertir en OptionalInt (pour l'instant, toujours présents)
+        OptionalInt optPlayerCount = OptionalInt.of(playerCount);
+        OptionalInt optBoardSize = OptionalInt.of(boardSize);
+
         // Créer le jeu
-        Game game = factory.createGame(playerCount, boardSize);
+        Game game = plugin.createGame(optPlayerCount, optBoardSize);
 
         // Générer un ID unique
         String gameId = UUID.randomUUID().toString();
