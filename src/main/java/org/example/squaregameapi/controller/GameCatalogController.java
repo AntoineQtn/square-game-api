@@ -1,5 +1,6 @@
-package org.example.squaregameapi;
+package org.example.squaregameapi.controller;
 
+import org.example.squaregameapi.GameCatalog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
