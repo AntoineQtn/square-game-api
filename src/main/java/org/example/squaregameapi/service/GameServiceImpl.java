@@ -1,7 +1,9 @@
 package org.example.squaregameapi.service;
 
+import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.GameFactory;
+import fr.le_campus_numerique.square_games.engine.Token;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
 import org.example.squaregameapi.GamePlugin;
 import org.example.squaregameapi.GameService;
@@ -65,5 +67,29 @@ public class GameServiceImpl implements GameService {
     public Object getGame(String gameId) {
         // Récupérer le jeu depuis la Map avec gameId
         return games.get(gameId);
+    }
+
+    @Override
+    public Game playMove(String gameId, int x, int y) {
+
+        Game game = games.get(gameId);
+
+        if (game == null) {
+            return null;
+        }
+
+        Collection<Token> remainingTokens = game.getRemainingTokens();
+
+        Token currentToken = remainingTokens.iterator().next();
+
+        CellPosition position = new CellPosition(x, y);
+
+        try {
+            currentToken.moveTo(position);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return game;
     }
 }

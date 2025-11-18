@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 @RestController
 public class GameCatalogController {
 
-//    @Autowired
+    //    @Autowired
 //    private GameCatalog gamecatalog;
     @Autowired
     private List<GamePlugin> plugins;
 
-    @GetMapping
+    @GetMapping("/games")
     public Collection<GameInfo> getGames(
-        @RequestHeader(name="Accept-language", defaultValue = "en")Locale locale){
+            @RequestHeader(name = "Accept-Language", defaultValue = "en") Locale locale) {
         return plugins.stream()
                 .map(plugin -> new GameInfo(
                         plugin.getGameType(),
