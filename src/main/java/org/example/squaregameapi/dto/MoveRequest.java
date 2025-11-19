@@ -3,6 +3,10 @@ package org.example.squaregameapi.dto;
 public class MoveRequest {
     private int x;
     private int y;
+
+    public MoveRequest() {
+    }
+
     public MoveRequest(int x, int y) {
         this.x = x;
         this.y = y;

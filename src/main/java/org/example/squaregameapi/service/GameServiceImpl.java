@@ -54,10 +54,8 @@ public class GameServiceImpl implements GameService {
         // Créer le jeu
         Game game = plugin.createGame(optPlayerCount, optBoardSize);
 
-        // Générer un ID unique
         String gameId = UUID.randomUUID().toString();
 
-        // Stocker le jeu dans la Map
         games.put(gameId, game);
 
         return gameId;
@@ -65,7 +63,6 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Object getGame(String gameId) {
-        // Récupérer le jeu depuis la Map avec gameId
         return games.get(gameId);
     }
 

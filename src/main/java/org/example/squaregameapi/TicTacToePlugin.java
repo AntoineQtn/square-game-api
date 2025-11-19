@@ -32,7 +32,7 @@ public class TicTacToePlugin implements GamePlugin {
     @Override
     public String getName(Locale locale) {
         return messageSource.getMessage(
-                "game.tictactoe.name",  // Clé à définir dans messages.properties
+                "game.tictactoe.name",
                 null,
                 locale
         );
@@ -40,11 +40,10 @@ public class TicTacToePlugin implements GamePlugin {
 
     @Override
     public Game createGame(OptionalInt playerCount, OptionalInt boardSize) {
-        // Récupérer les valeurs (fournies ou par défaut)
+        // Récupérer les valeurs
         int playerCountValue = playerCount.orElse(defaultPlayerCount);
         int boardSizeValue = boardSize.orElse(defaultBoardSize);
 
-        // Utiliser les BONS noms de variables !
         return factory.createGame(playerCountValue, boardSizeValue);
     }
 }
