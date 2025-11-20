@@ -3,6 +3,7 @@ package org.example.squaregameapi.service;
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.Token;
+import org.example.squaregameapi.dao.GameDAO;
 import org.example.squaregameapi.plugin.GamePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,9 @@ import java.util.*;
 public class GameServiceImpl implements GameService {
 
     // Stockage des sessions en Map
-    private Map<String, Game> games = new HashMap<>();
+//    private Map<String, Game> games = new HashMap<>();
+    @Autowired
+    private GameDAO gameDao;
 
     // Stockage des factories en Map
     //private Map<String, GameFactory> factories = new HashMap<>();
@@ -52,21 +55,23 @@ public class GameServiceImpl implements GameService {
 
         String gameId = UUID.randomUUID().toString();
 
-        games.put(gameId, game);
+        gameDao.save(game);
+//        games.put(gameId, game);
 
         return gameId;
     }
 
     @Override
     public Object getGame(String gameId) {
-        return games.get(gameId);
+//        return games.get(gameId);
+        return gameDao.findById(gameId);
     }
 
     @Override
     public Game playMove(String gameId, int x, int y) {
 
-        Game game = games.get(gameId);
-
+//        GameDAO game = games.get(gameId);/
+        Game game = gameDao.findById(gameId);
         if (game == null) {
             return null;
         }
@@ -83,6 +88,7 @@ public class GameServiceImpl implements GameService {
             e.printStackTrace();
             return null;
         }
+        gameDao.update(game);
         return game;
     }
 }
