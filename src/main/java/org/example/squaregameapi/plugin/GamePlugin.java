@@ -1,12 +1,15 @@
-package org.example.squaregameapi;
+package org.example.squaregameapi.plugin;
 
 import fr.le_campus_numerique.square_games.engine.Game;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.Locale;
 import java.util.OptionalInt;
 
+/**
+ * Represents a contract for creating and managing game plugins in the system.
+ * Implementations of this interface are responsible for defining the specific game type they support,
+ * providing localized names for the game, and creating instances of the game with customizable parameters.
+ */
 public interface GamePlugin {
 
 //    @NotBlank

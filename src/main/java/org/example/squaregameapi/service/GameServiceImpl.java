@@ -2,16 +2,18 @@ package org.example.squaregameapi.service;
 
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
-import fr.le_campus_numerique.square_games.engine.GameFactory;
 import fr.le_campus_numerique.square_games.engine.Token;
-import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
-import org.example.squaregameapi.GamePlugin;
-import org.example.squaregameapi.GameService;
+import org.example.squaregameapi.plugin.GamePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Implementation of the GameService interface responsible for managing and interacting with game sessions.
+ * This service allows the creation of new games using plugins, retrieval of active game sessions,
+ * and performing moves within a game.
+ */
 @Service
 public class GameServiceImpl implements GameService {
 
@@ -36,22 +38,16 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public String createGame(String gameType, int playerCount, int boardSize) {
-        // Récupérer la factory selon gameType
-        //GameFactory factory = factories.get(gameType);
 
         GamePlugin plugin = plugins.get(gameType);
 
-        // Vérifier qu'elle existe
         if (plugin == null) {
-            // Pour l'instant retourne null plus tard Exception
             return null;
         }
 
-        // Convertir en OptionalInt (pour l'instant, toujours présents)
         OptionalInt optPlayerCount = OptionalInt.of(playerCount);
         OptionalInt optBoardSize = OptionalInt.of(boardSize);
 
-        // Créer le jeu
         Game game = plugin.createGame(optPlayerCount, optBoardSize);
 
         String gameId = UUID.randomUUID().toString();
