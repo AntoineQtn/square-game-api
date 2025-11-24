@@ -10,7 +10,7 @@ package org.example.squaregameapi.dto;
  * - x: The horizontal coordinate of the move.
  * - y: The vertical coordinate of the move.
  *
- * Instances of this class can be utilized in methods or endpoints
+ * Instances of this class can be used in methods or endpoints
  * that handle game move logic.
  */
 public class MoveRequest {

@@ -27,7 +27,7 @@ public class ConnectFourPlugin implements GamePlugin{
 
     @Override
     public String getGameType() {
-        return "connect-four";
+        return "connectfour";
     }
 
     @Override

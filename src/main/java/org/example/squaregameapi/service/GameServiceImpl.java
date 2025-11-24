@@ -4,6 +4,7 @@ import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.Token;
 import org.example.squaregameapi.dao.GameDAO;
+import org.example.squaregameapi.dao.MoveDAO;
 import org.example.squaregameapi.plugin.GamePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,17 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private GameDAO gameDao;
 
+    @Autowired
+    private MoveDAO moveDAO;
+
     // Stockage des factories en Map
     //private Map<String, GameFactory> factories = new HashMap<>();
 
     // Stockage des plugins en Map
     private Map<String, GamePlugin> plugins = new HashMap<>();
+
+    // Compteur de coups par partie (en mémoire pour simplifier)
+    private Map<String, Integer> moveCounters = new HashMap<>();
 
     @Autowired
     public GameServiceImpl(List<GamePlugin> pluginList) {
@@ -88,7 +95,13 @@ public class GameServiceImpl implements GameService {
             e.printStackTrace();
             return null;
         }
-        gameDao.update(game);
+//        gameDao.update(game);
+        // Déterminer l'ordre du coup
+        int moveOrder = moveCounters.getOrDefault(gameId, 0) + 1;
+        moveCounters.put(gameId, moveOrder);
+
+        // Enregistrer le coup dans la table moves
+        moveDAO.saveMove(gameId, moveOrder, x, y);
         return game;
     }
 }

@@ -38,7 +38,7 @@ public class TicTacToePlugin implements GamePlugin {
 
     @Override
     public String getGameType() {
-        return "tic-tac-toe";
+        return "tictactoe";
     }
 
     @Override
