@@ -119,4 +119,16 @@ public class MoveEntity {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    /**
+     * Callback method automatically invoked by JPA before persisting a new entity.
+     *
+     * This method sets the createdAt timestamp to the current date and time
+     * when an entity is first persisted to the database. It ensures that the
+     * createdAt field is populated correctly for newly created entities.
+     */
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

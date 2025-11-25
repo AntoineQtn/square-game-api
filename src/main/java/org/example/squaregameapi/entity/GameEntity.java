@@ -1,9 +1,6 @@
 package org.example.squaregameapi.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -74,6 +71,40 @@ public class GameEntity {
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /**
+     * Lifecycle callback method annotated with {@code @PrePersist}, which is
+     * invoked automatically before a new entity is persisted in the database.
+     *
+     * The purpose of this method is to initialize the {@code createdAt} and
+     * {@code updatedAt} fields with the current date and time. This ensures that
+     * these fields are populated with the correct timestamps when the entity
+     * is first saved.
+     *
+     * This method is automatically executed by the JPA provider and does not
+     * require explicit invocation.
+     */
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Lifecycle callback method annotated with {@code @PreUpdate}, which is
+     * invoked automatically before an existing entity is updated in the database.
+     *
+     * The purpose of this method is to update the {@code updatedAt} field
+     * with the current date and time, ensuring that the timestamp reflects
+     * the most recent modification of the entity.
+     *
+     * This method is automatically executed by the JPA provider and does not
+     * require explicit invocation.
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
 }
