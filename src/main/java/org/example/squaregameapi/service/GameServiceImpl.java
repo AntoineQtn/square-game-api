@@ -5,7 +5,11 @@ import fr.le_campus_numerique.square_games.engine.Game;
 import fr.le_campus_numerique.square_games.engine.Token;
 import org.example.squaregameapi.dao.GameDAO;
 import org.example.squaregameapi.dao.MoveDAO;
+import org.example.squaregameapi.entity.GameEntity;
+import org.example.squaregameapi.entity.MoveEntity;
 import org.example.squaregameapi.plugin.GamePlugin;
+import org.example.squaregameapi.repository.GameRepository;
+import org.example.squaregameapi.repository.MoveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +25,16 @@ public class GameServiceImpl implements GameService {
 
     // Stockage des sessions en Map
 //    private Map<String, Game> games = new HashMap<>();
-    @Autowired
-    private GameDAO gameDao;
+//    @Autowired
+//    private GameDAO gameDao;
+
+//    @Autowired
+//    private MoveDAO moveDAO;
 
     @Autowired
-    private MoveDAO moveDAO;
+    private GameRepository gameRepository;
+    @Autowired
+    private MoveRepository moveRepository;
 
     // Stockage des factories en Map
     //private Map<String, GameFactory> factories = new HashMap<>();
@@ -58,33 +67,85 @@ public class GameServiceImpl implements GameService {
         OptionalInt optPlayerCount = OptionalInt.of(playerCount);
         OptionalInt optBoardSize = OptionalInt.of(boardSize);
 
+
         Game game = plugin.createGame(optPlayerCount, optBoardSize);
+        GameEntity gameEntity = new GameEntity(game.getId().toString(), game.getFactoryId());
+        gameRepository.save(gameEntity);
+        return game.getId().toString();
 
-        String gameId = UUID.randomUUID().toString();
-
-        gameDao.save(game);
-//        games.put(gameId, game);
-
-        return gameId;
+//        String gameId = UUID.randomUUID().toString();
+//
+//        gameDao.save(game);
+////        games.put(gameId, game);
+//
+//        return gameId;
     }
 
     @Override
     public Object getGame(String gameId) {
 //        return games.get(gameId);
-        return gameDao.findById(gameId);
+        GameEntity gameEntity = gameRepository.findById(gameId).orElse(null);
+        if (gameEntity == null) {
+            return null;
+        }
+        GamePlugin plugin = findPlugin(gameEntity.getGameType());
+        if(plugin == null){
+            return null;
+        }
+        Game game = plugin.createGame(OptionalInt.of(2), OptionalInt.empty());
+
+        List<MoveEntity> moves = moveRepository.findByGameOrderByMoveOrderAsc(gameEntity);
+        for(MoveEntity moveEntity : moves){
+            Collection<Token> remainingTokens = game.getRemainingTokens();
+            if(!remainingTokens.isEmpty()){
+                Token token = remainingTokens.iterator().next();
+                CellPosition position = new CellPosition(moveEntity.getX(), moveEntity.getY());
+                try {
+                    token.moveTo(position);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return game;
     }
 
     @Override
     public Game playMove(String gameId, int x, int y) {
 
 //        GameDAO game = games.get(gameId);/
-        Game game = gameDao.findById(gameId);
-        if (game == null) {
+//        Game game = gameDao.findById(gameId);
+        Optional<GameEntity> optionalGame = gameRepository.findById(gameId);
+        if (optionalGame.isEmpty()) {
             return null;
+        }
+        GameEntity gameEntity = optionalGame.get();
+
+        GamePlugin plugin = findPlugin(gameEntity.getGameType());
+        if (plugin == null) {
+            return null;
+        }
+        Game game = plugin.createGame(OptionalInt.of(2), OptionalInt.empty());
+        List<MoveEntity> moves = moveRepository.findByGameOrderByMoveOrderAsc(gameEntity);
+
+        for(MoveEntity moveEntity : moves){
+            Collection<Token> remainingTokens = game.getRemainingTokens();
+            if(!remainingTokens.isEmpty()){
+                Token token = remainingTokens.iterator().next();
+                CellPosition position = new CellPosition(moveEntity.getX(), moveEntity.getY());
+                try {
+                    token.moveTo(position);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         Collection<Token> remainingTokens = game.getRemainingTokens();
-
+        if(remainingTokens.isEmpty()){
+            return null;
+        }
         Token currentToken = remainingTokens.iterator().next();
 
         CellPosition position = new CellPosition(x, y);
@@ -95,13 +156,21 @@ public class GameServiceImpl implements GameService {
             e.printStackTrace();
             return null;
         }
+        int moveOrder = moves.size() + 1;
+        MoveEntity newMove = new MoveEntity(gameEntity, moveOrder, x, y);
+        moveRepository.save(newMove);
+
 //        gameDao.update(game);
         // Déterminer l'ordre du coup
-        int moveOrder = moveCounters.getOrDefault(gameId, 0) + 1;
-        moveCounters.put(gameId, moveOrder);
+//        int moveOrder = moveCounters.getOrDefault(gameId, 0) + 1;
+//        moveCounters.put(gameId, moveOrder);
 
         // Enregistrer le coup dans la table moves
-        moveDAO.saveMove(gameId, moveOrder, x, y);
+//        moveDAO.saveMove(gameId, moveOrder, x, y);
         return game;
+    }
+    //Helper method
+    private GamePlugin findPlugin(String gameType) {
+        return plugins.get(gameType);
     }
 }

@@ -33,8 +33,8 @@ import java.util.OptionalInt;
  * The class is annotated with @Repository to indicate its role in Spring's persistence layer.
  * Additionally, it is annotated with @Primary to denote that it should be prioritized when multiple GameDAO implementations are available.
  */
-@Repository
-@Primary
+//@Repository
+//@Primary
 public class GameDAOMySQLImpl implements GameDAO {
 
     // ObjectMapper to convert Game objects to and from JSON
@@ -42,10 +42,10 @@ public class GameDAOMySQLImpl implements GameDAO {
             .registerModule(new Jdk8Module());
 
 
-    @Autowired
+//    @Autowired
     private MoveDAO moveDAO;
 
-    @Autowired
+ //   @Autowired
     private List<GamePlugin> plugins;
 
     /**

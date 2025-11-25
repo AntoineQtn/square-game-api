@@ -33,7 +33,7 @@ import java.util.List;
  * This class is annotated with @Repository to allow Spring to detect it as a component
  * for persistence operations within the application context.
  */
-@Repository
+//@Repository
 public class MoveDAOImpl implements MoveDAO {
 
     /**
