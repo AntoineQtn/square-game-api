@@ -3,6 +3,8 @@ package org.example.squaregameapi.repository;
 import org.example.squaregameapi.entity.GameEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  * GameRepository is a Spring Data JPA repository for managing persistence
  * and CRUD operations on {@link GameEntity}.
@@ -16,4 +18,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * pagination and sorting, using the entity's ID as the unique identifier.
  */
 public interface GameRepository extends JpaRepository<GameEntity, String> {
+
+    List<GameEntity> findByPlayer1IdOrPlayer2Id(String player1Id, String player2Id);
+
 }

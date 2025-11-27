@@ -49,6 +49,7 @@ public class MoveEntity {
      * without initializing any of its fields. It is required by JPA
      * for entity instantiation during database operations.
      *
+     *
      * Use this constructor when creating a MoveEntity instance
      * through the JPA repository or when the field values will be set
      * manually after instantiation.

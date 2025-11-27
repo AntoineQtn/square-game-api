@@ -1,11 +1,15 @@
 package org.example.squaregameapi.controller;
 
+import fr.le_campus_numerique.square_games.engine.Game;
+import org.example.squaregameapi.client.UserClientService;
 import org.example.squaregameapi.dto.GameInfo;
 import org.example.squaregameapi.plugin.GamePlugin;
 import org.example.squaregameapi.service.GameService;
 import org.example.squaregameapi.dto.GameCreationParams;
 import org.example.squaregameapi.dto.MoveRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -13,26 +17,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-/**
- * REST controller that provides endpoints for managing and interacting with games.
- * The GameController delegates requests to the GameService to handle the core game logic.
- */
 @RestController
 public class GameController {
 
-    /**
-     * Service responsible for processing game-related operations.
-     * This instance of GameService is injected into the controller and provides
-     * the core functionality for creating games, retrieving game state details, and
-     * handling game moves. It enables separation of concerns, delegating the business logic
-     * for game management to a dedicated service layer.
-     */
+    @Autowired
+    private UserClientService userClientService;
+
     @Autowired
     private GameService gameService;
 
     @Autowired
     private List<GamePlugin> plugins;
 
+    /**
+     * Récupère la liste des types de jeux disponibles.
+     */
     @GetMapping("/games")
     public Collection<GameInfo> getGames(
             @RequestHeader(name = "Accept-Language", defaultValue = "en") Locale locale) {
@@ -44,38 +43,71 @@ public class GameController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Récupère l'état complet d'une partie.
+     */
     @GetMapping("/games/{gameId}")
     public Object getGame(@PathVariable String gameId) {
         return gameService.getGame(gameId);
     }
 
-    /**
-     * Creates a new game with the specified parameters and returns the unique identifier
-     * of the newly created game.
-     *
-     * @param params the parameters for creating the game, including the game type,
-     *               number of players, and board size
-     * @return the unique identifier of the newly created game
-     */
-    @PostMapping("/games")
-    public String createGame(@RequestBody GameCreationParams params) {
-        String gameId = gameService.createGame(params.getGameType(), params.getPlayerCount(), params.getBoardSize());
-        return gameId;
+    @GetMapping("/games/my-games")
+    public Collection<Game> getMyGames(@RequestHeader("X-UserId") String userId) {
+        return gameService.getGamesByPlayer(userId);
     }
 
     /**
-     * Handles a move operation in the specified game by delegating the request to the game service.
+     * Crée une nouvelle partie et retourne son état complet.
      *
-     * @param gameId the unique identifier of the game where the move is to be played
-     * @param move the move request object containing the coordinates (x, y) of the move
-     * @return the updated state of the game after the move has been processed
+     * @param params paramètres de création (type, nombre de joueurs, taille)
+     * @return l'état complet de la partie créée (JSON)
+     */
+    @PostMapping("/games")
+    public Object createGame(
+            @RequestBody GameCreationParams params,
+            @RequestHeader ("X-UserId") String userId
+    ) {
+        if(!userClientService.verifyUserExists(userId)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        System.out.println("Received request: " + params.getGameType());
+
+        String gameId = gameService.createGame(
+                params.getGameType(),
+                params.getPlayerCount(),
+                params.getBoardSize(),
+                userId
+        );
+
+        System.out.println("Game created with ID: " + gameId);
+
+        Object game = gameService.getGame(gameId);
+
+        System.out.println("Game object: " + game);
+        System.out.println("Game is null? " + (game == null));
+
+        return gameService.getGame(gameId);
+    }
+
+    /**
+     * Joue un coup dans une partie existante.
+     *
+     * @param gameId identifiant unique de la partie
+     * @param move coordonnées du coup (x, y)
+     * @return l'état mis à jour de la partie
      */
     @PatchMapping("/games/{gameId}/move")
     public Object playMove(
             @PathVariable String gameId,
-            @RequestBody MoveRequest move
+            @RequestBody MoveRequest move,
+            @RequestHeader("X-UserId") String userId  // <- AJOUTEZ
     ) {
-        return gameService.playMove(gameId, move.getX(), move.getY());
-    }
+        // Vérifier que l'utilisateur existe
+        if (!userClientService.verifyUserExists(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
+        // Jouer le coup (le Service vérifiera si c'est son tour)
+        return gameService.playMove(gameId, move.getX(), move.getY(), userId);  // <- Passez userId
+    }
 }

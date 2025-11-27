@@ -31,6 +31,18 @@ public class GameEntity {
     @Column(name = "game_type", nullable = false, length = 50)
     private String gameType;
 
+    @Column(name = "creator_id", nullable = false)
+    private String creatorId;
+
+    @Column(name = "player1_id", nullable = false)
+    private String player1Id;
+
+    @Column(name = "player2_id")
+    private String player2Id;
+
+    @Column(name = "status", nullable = false)
+    private String status = "IN_PROGRESS";
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -43,13 +55,40 @@ public class GameEntity {
     public GameEntity() {
     }
 
-    public GameEntity(String id, String gameType) {
+    public GameEntity(String id, String gameType, String creatorId) {
         this.id = id;
         this.gameType = gameType;
+        this.creatorId = creatorId;
+        this.player1Id = creatorId;
+        this.status = "IN_PROGRESS";
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+    public String getCreatorId() {
+        return creatorId;
+    }
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+    public String getPlayer1Id() {
+        return player1Id;
+    }
+    public void setPlayer1Id(String player1Id) {
+        this.player1Id = player1Id;
+    }
+    public String getPlayer2Id() {
+        return player2Id;
+    }
+    public void setPlayer2Id(String player2Id) {
+        this.player2Id = player2Id;
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
     public String getId() {
         return id;
