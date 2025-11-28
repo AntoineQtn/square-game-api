@@ -21,21 +21,10 @@ import java.util.*;
 @Service
 public class GameServiceImpl implements GameService {
 
-    // Stockage des sessions en Map
-//    private Map<String, Game> games = new HashMap<>();
-//    @Autowired
-//    private GameDAO gameDao;
-
-//    @Autowired
-//    private MoveDAO moveDAO;
-
     @Autowired
     private GameRepository gameRepository;
     @Autowired
     private MoveRepository moveRepository;
-
-    // Stockage des factories en Map
-    //private Map<String, GameFactory> factories = new HashMap<>();
 
     // Stockage des plugins en Map
     private Map<String, GamePlugin> plugins = new HashMap<>();
@@ -48,10 +37,6 @@ public class GameServiceImpl implements GameService {
         pluginList.forEach(plugin -> plugins.put(plugin.getGameType(), plugin));
     }
 
-//    public GameServiceImpl() {
-//        // Initialisation des factories
-//        factories.put("tic-tac-toe", new TicTacToeGameFactory());
-//    }
 
     /**
      * Creates a new game based on the given parameters.
@@ -99,7 +84,6 @@ public class GameServiceImpl implements GameService {
      */
     @Override
     public Object getGame(String gameId) {
-//        return games.get(gameId);
         GameEntity gameEntity = gameRepository.findById(gameId).orElse(null);
         if (gameEntity == null) {
             return null;
@@ -164,22 +148,6 @@ public class GameServiceImpl implements GameService {
 
         Game game = plugin.createGame(OptionalInt.of(2), OptionalInt.empty());
 
-
-//        GameDAO game = games.get(gameId);/
-//        Game game = gameDao.findById(gameId);
-//        Optional<GameEntity> optionalGame = gameRepository.findById(gameId);
-//        if (optionalGame.isEmpty()) {
-//            return null;
-//        }
-//        GameEntity gameEntity = optionalGame.get();
-//
-//        GamePlugin plugin = findPlugin(gameEntity.getGameType());
-//        if (plugin == null) {
-//            return null;
-//        }
-//        Game game = plugin.createGame(OptionalInt.of(2), OptionalInt.empty());
-//        List<MoveEntity> moves = moveRepository.findByGameOrderByMoveOrderAsc(gameEntity);
-
         for (MoveEntity moveEntity : moves) {
             Collection<Token> remainingTokens = game.getRemainingTokens();
             if (!remainingTokens.isEmpty()) {
@@ -211,13 +179,6 @@ public class GameServiceImpl implements GameService {
         MoveEntity newMove = new MoveEntity(gameEntity, moveOrder, x, y);
         moveRepository.save(newMove);
 
-//        gameDao.update(game);
-        // Déterminer l'ordre du coup
-//        int moveOrder = moveCounters.getOrDefault(gameId, 0) + 1;
-//        moveCounters.put(gameId, moveOrder);
-
-        // Enregistrer le coup dans la table moves
-//        moveDAO.saveMove(gameId, moveOrder, x, y);
         return game;
     }
 
@@ -241,18 +202,7 @@ public class GameServiceImpl implements GameService {
         }
 
         return games;
-//        if (gameEntities.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//        GamePlugin plugin = findPlugin(gameEntities.getGameType());
-//        if (plugin == null) {
-//            return null;
-//        }
-//        Game game = plugin.createGame(OptionalInt.of(2), OptionalInt.empty());
-//        for (GameEntity gameEntity : gameEntities) {
-//
-//        }
-//        return null;
+
     }
 
 

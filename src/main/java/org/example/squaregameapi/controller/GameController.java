@@ -100,14 +100,14 @@ public class GameController {
     public Object playMove(
             @PathVariable String gameId,
             @RequestBody MoveRequest move,
-            @RequestHeader("X-UserId") String userId  // <- AJOUTEZ
+            @RequestHeader("X-UserId") String userId
     ) {
         // Vérifier que l'utilisateur existe
         if (!userClientService.verifyUserExists(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Jouer le coup (le Service vérifiera si c'est son tour)
-        return gameService.playMove(gameId, move.getX(), move.getY(), userId);  // <- Passez userId
+        // Jouer le coup
+        return gameService.playMove(gameId, move.getX(), move.getY(), userId);
     }
 }
